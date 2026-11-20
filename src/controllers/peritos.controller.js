@@ -93,8 +93,34 @@ const createPerito = async (req, res, next) => {
   }
 };
 
+// DELETE /api/v1/peritos/:id (Soft Delete)
+const deletePerito = async (req, res, next) => {
+  try {
+    const perito = await User.findOne({
+      where: {
+        id: req.params.id,
+        active: true,
+      },
+    });
+
+    if (!perito) {
+      return next(createError(404, 'Perito no encontrado o ya dado de baja'));
+    }
+
+    await perito.update({ active: false });
+
+    return res.json({
+      message: `Perito '${perito.username}' dado de baja correctamente`,
+    });
+  } catch (err) {
+    return next(err);
+  }
+};
+
+
 module.exports = {
   getPeritos,
   getPeritoById,
   createPerito,
+  deletePerito,
 };
